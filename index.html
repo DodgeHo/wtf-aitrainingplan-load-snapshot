@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AiTrainingPlan Daily Load Snapshot</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #162033;
+      --muted: #637083;
+      --line: #dce3ee;
+      --blue: #246bfe;
+      --green: #18845b;
+      --amber: #b7791f;
+      --red: #c2413f;
+      --shadow: 0 12px 34px rgba(30, 45, 70, 0.10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    main { max-width: 1120px; margin: 0 auto; padding: 28px 18px 36px; }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    .eyebrow { margin: 0 0 7px; color: var(--blue); font-size: 13px; font-weight: 760; text-transform: uppercase; letter-spacing: 0; }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 48px); line-height: 1.02; letter-spacing: 0; max-width: 760px; }
+    .lede { margin: 13px 0 0; color: var(--muted); max-width: 760px; font-size: 17px; }
+    .badge { border: 1px solid var(--line); background: var(--panel); padding: 10px 12px; border-radius: 8px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .grid { display: grid; grid-template-columns: 0.96fr 1.04fr; gap: 18px; margin-top: 22px; align-items: start; }
+    section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+    .section-head { padding: 18px 18px 0; }
+    h2 { margin: 0; font-size: 19px; }
+    .hint { margin: 7px 0 0; color: var(--muted); font-size: 14px; }
+    .controls { padding: 14px 18px 18px; display: grid; gap: 14px; }
+    label { display: grid; gap: 7px; font-weight: 700; font-size: 14px; }
+    .row { display: grid; grid-template-columns: minmax(0, 1fr) 72px; gap: 12px; align-items: center; }
+    input[type="range"] { width: 100%; accent-color: var(--blue); }
+    output { border: 1px solid var(--line); border-radius: 7px; padding: 7px 8px; text-align: right; color: var(--ink); background: #fbfcff; font-variant-numeric: tabular-nums; }
+    .segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .segmented button, .primary, .secondary {
+      border: 1px solid var(--line);
+      background: #fbfcff;
+      color: var(--ink);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-weight: 760;
+      cursor: pointer;
+    }
+    .segmented button.active { border-color: var(--blue); background: #edf4ff; color: #174ea6; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 2px; }
+    .primary { background: var(--blue); color: white; border-color: var(--blue); }
+    .secondary { color: var(--muted); }
+    .result { padding: 18px; display: grid; gap: 14px; }
+    .decision { border-radius: 8px; padding: 16px; border: 1px solid var(--line); background: #f8fbff; }
+    .decision strong { display: block; font-size: 26px; line-height: 1.12; }
+    .decision p { margin: 8px 0 0; color: var(--muted); }
+    .status-maintain { border-left: 6px solid var(--green); }
+    .status-adjust { border-left: 6px solid var(--amber); }
+    .status-backoff { border-left: 6px solid var(--red); }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .metric { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: #fbfcff; min-height: 86px; }
+    .metric span { display: block; color: var(--muted); font-size: 12px; font-weight: 760; text-transform: uppercase; letter-spacing: 0; }
+    .metric b { display: block; margin-top: 7px; font-size: 24px; font-variant-numeric: tabular-nums; }
+    .explain { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .box { border: 1px solid var(--line); border-radius: 8px; padding: 13px; background: #ffffff; }
+    .box h3 { margin: 0 0 8px; font-size: 15px; }
+    ul { margin: 0; padding-left: 18px; color: var(--muted); }
+    li + li { margin-top: 5px; }
+    .note { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding: 13px 18px 16px; }
+    .note strong { color: var(--ink); }
+    @media (max-width: 820px) {
+      header, .grid, .explain { grid-template-columns: 1fr; }
+      .badge { white-space: normal; }
+      .metrics { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">AiTrainingPlan prototype</p>
+        <h1>Daily Load Snapshot for one training decision</h1>
+        <p class="lede">A small decision-support screen that turns recent training load, soreness, sleep, and race urgency into an inspectable recommendation for today.</p>
+      </div>
+      <div class="badge">Mock data only · No medical advice · Built as a 25-minute product stub</div>
+    </header>
+
+    <div class="grid">
+      <section aria-labelledby="input-title">
+        <div class="section-head">
+          <h2 id="input-title">Athlete context</h2>
+          <p class="hint">Adjust the sliders or load a sample scenario. Values are illustrative, not connected to a real wearable or training plan.</p>
+        </div>
+        <div class="controls">
+          <label>7-day load
+            <div class="row"><input id="acute" type="range" min="120" max="980" value="620" /><output id="acuteOut">620</output></div>
+          </label>
+          <label>28-day average load
+            <div class="row"><input id="chronic" type="range" min="140" max="880" value="520" /><output id="chronicOut">520</output></div>
+          </label>
+          <label>Soreness today
+            <div class="row"><input id="soreness" type="range" min="0" max="10" value="5" /><output id="sorenessOut">5</output></div>
+          </label>
+          <label>Sleep quality last night
+            <div class="row"><input id="sleep" type="range" min="1" max="10" value="6" /><output id="sleepOut">6</output></div>
+          </label>
+          <label>Next key race</label>
+          <div class="segmented" role="group" aria-label="Race priority">
+            <button type="button" data-race="low">Low</button>
+            <button type="button" data-race="medium" class="active">Medium</button>
+            <button type="button" data-race="high">High</button>
+          </div>
+          <div class="actions">
+            <button class="primary" id="sampleBtn" type="button">Load sample</button>
+            <button class="secondary" id="steadyBtn" type="button">Set steady week</button>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="decision-title">
+        <div class="section-head">
+          <h2 id="decision-title">Recommendation</h2>
+          <p class="hint">The point is not to replace a coach. The point is to show the athlete why the plan changed.</p>
+        </div>
+        <div class="result">
+          <div id="decisionCard" class="decision status-adjust">
+            <strong id="decisionText">Adjust today</strong>
+            <p id="decisionCopy">Reduce intensity and keep the session aerobic.</p>
+          </div>
+          <div class="metrics">
+            <div class="metric"><span>ACWR-like ratio</span><b id="ratio">1.19</b></div>
+            <div class="metric"><span>Confidence</span><b id="confidence">Medium</b></div>
+            <div class="metric"><span>Suggested session</span><b id="session">Easy 40 min</b></div>
+          </div>
+          <div class="explain">
+            <div class="box">
+              <h3>Why this changed</h3>
+              <ul id="reasons"></ul>
+            </div>
+            <div class="box">
+              <h3>Validator checks</h3>
+              <ul id="checks"></ul>
+            </div>
+          </div>
+        </div>
+        <p class="note"><strong>Limitation:</strong> This prototype uses simple rules to make the reasoning visible. A production feature would need workout history, injury context, user goals, coach preferences, and careful validation.</p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const els = {
+      acute: document.querySelector('#acute'), chronic: document.querySelector('#chronic'), soreness: document.querySelector('#soreness'), sleep: document.querySelector('#sleep'),
+      acuteOut: document.querySelector('#acuteOut'), chronicOut: document.querySelector('#chronicOut'), sorenessOut: document.querySelector('#sorenessOut'), sleepOut: document.querySelector('#sleepOut'),
+      ratio: document.querySelector('#ratio'), confidence: document.querySelector('#confidence'), session: document.querySelector('#session'), decisionText: document.querySelector('#decisionText'),
+      decisionCopy: document.querySelector('#decisionCopy'), decisionCard: document.querySelector('#decisionCard'), reasons: document.querySelector('#reasons'), checks: document.querySelector('#checks')
+    };
+    let racePriority = 'medium';
+    function list(items) { return items.map(item => `<li>${item}</li>`).join(''); }
+    function update() {
+      const acute = Number(els.acute.value);
+      const chronic = Number(els.chronic.value);
+      const soreness = Number(els.soreness.value);
+      const sleep = Number(els.sleep.value);
+      const ratio = acute / chronic;
+      const raceBoost = racePriority === 'high' ? -0.35 : racePriority === 'low' ? 0.15 : 0;
+      const risk = (ratio - 1) * 3 + soreness * 0.22 + (7 - sleep) * 0.2 + raceBoost;
+      els.acuteOut.value = acute;
+      els.chronicOut.value = chronic;
+      els.sorenessOut.value = soreness;
+      els.sleepOut.value = sleep;
+      els.ratio.textContent = ratio.toFixed(2);
+      const reasons = [];
+      if (ratio > 1.25) reasons.push('Recent load is meaningfully above the 28-day baseline.');
+      else if (ratio < 0.85) reasons.push('Recent load is below baseline, so a controlled build is possible.');
+      else reasons.push('Recent load is close to the athlete\'s current baseline.');
+      if (soreness >= 7) reasons.push('Soreness is high enough to treat intensity as optional today.');
+      else if (soreness <= 3) reasons.push('Soreness is low, so the plan can preserve training stimulus.');
+      if (sleep <= 4) reasons.push('Poor sleep lowers confidence in a hard session.');
+      if (racePriority === 'high') reasons.push('Race priority is high, so the tool avoids unnecessary risk.');
+      let state = 'maintain';
+      if (risk >= 2.65) state = 'backoff';
+      else if (risk >= 1.35) state = 'adjust';
+      els.decisionCard.className = `decision status-${state === 'maintain' ? 'maintain' : state === 'adjust' ? 'adjust' : 'backoff'}`;
+      if (state === 'backoff') {
+        els.decisionText.textContent = 'Back off today';
+        els.decisionCopy.textContent = 'Replace intensity with recovery or a short easy session, then reassess tomorrow.';
+        els.session.textContent = 'Recovery 25 min';
+        els.confidence.textContent = 'High';
+      } else if (state === 'adjust') {
+        els.decisionText.textContent = 'Adjust today';
+        els.decisionCopy.textContent = 'Keep the workout, but reduce intensity or duration so the plan remains sustainable.';
+        els.session.textContent = 'Easy 40 min';
+        els.confidence.textContent = sleep <= 4 ? 'Medium' : 'High';
+      } else {
+        els.decisionText.textContent = 'Maintain plan';
+        els.decisionCopy.textContent = 'The current context supports completing the planned session with normal caution.';
+        els.session.textContent = racePriority === 'high' ? 'Race-specific work' : 'Planned workout';
+        els.confidence.textContent = 'Medium';
+      }
+      els.reasons.innerHTML = list(reasons);
+      els.checks.innerHTML = list([
+        ratio > 1.35 ? 'Load spike flagged for review.' : 'No major load spike detected.',
+        soreness >= 8 ? 'Soreness requires a conservative override.' : 'Soreness stays within a usable planning range.',
+        sleep <= 4 ? 'Recovery signal is weak; avoid blind intensity.' : 'Recovery signal does not block training.',
+        'Human override remains available for coach or athlete context.'
+      ]);
+    }
+    document.querySelectorAll('[data-race]').forEach(button => {
+      button.addEventListener('click', () => {
+        racePriority = button.dataset.race;
+        document.querySelectorAll('[data-race]').forEach(item => item.classList.toggle('active', item === button));
+        update();
+      });
+    });
+    document.querySelector('#sampleBtn').addEventListener('click', () => {
+      els.acute.value = 760; els.chronic.value = 500; els.soreness.value = 7; els.sleep.value = 4;
+      racePriority = 'high';
+      document.querySelectorAll('[data-race]').forEach(item => item.classList.toggle('active', item.dataset.race === racePriority));
+      update();
+    });
+    document.querySelector('#steadyBtn').addEventListener('click', () => {
+      els.acute.value = 490; els.chronic.value = 520; els.soreness.value = 3; els.sleep.value = 8;
+      racePriority = 'medium';
+      document.querySelectorAll('[data-race]').forEach(item => item.classList.toggle('active', item.dataset.race === racePriority));
+      update();
+    });
+    ['acute', 'chronic', 'soreness', 'sleep'].forEach(id => els[id].addEventListener('input', update));
+    update();
+  </script>
+</body>
+</html>
